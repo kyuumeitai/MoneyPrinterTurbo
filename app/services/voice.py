@@ -16,8 +16,9 @@ from app.utils import utils
 
 
 def get_all_azure_voices(filter_locals=None) -> list[str]:
-    if filter_locals is None:
-        filter_locals = ["zh-CN", "en-US", "zh-HK", "zh-TW", "vi-VN"]
+    # Remove the default filter to show all voices
+    # if filter_locals is None:
+    #     filter_locals = ["zh-CN", "en-US", "zh-HK", "zh-TW", "vi-VN"]
     voices_str = """
 Name: af-ZA-AdriNeural
 Gender: Female
@@ -1014,28 +1015,34 @@ Name: zh-CN-XiaoxiaoMultilingualNeural-V2
 Gender: Female
     """.strip()
     voices = []
-    name = ""
-    for line in voices_str.split("\n"):
+    current_voice = {}
+    
+    for line in voices_str.strip().split("\n"):
         line = line.strip()
         if not line:
+            if current_voice:
+                voice_locale = current_voice["Name"].split("-")[0:2]
+                voice_locale = "-".join(voice_locale)
+                # Only filter if filter_locals is explicitly provided
+                if filter_locals and voice_locale not in filter_locals:
+                    current_voice = {}
+                    continue
+                voices.append(current_voice["Name"])
+                current_voice = {}
             continue
+        
         if line.startswith("Name: "):
-            name = line[6:].strip()
-        if line.startswith("Gender: "):
-            gender = line[8:].strip()
-            if name and gender:
-                # voices.append({
-                #     "name": name,
-                #     "gender": gender,
-                # })
-                if filter_locals:
-                    for filter_local in filter_locals:
-                        if name.lower().startswith(filter_local.lower()):
-                            voices.append(f"{name}-{gender}")
-                else:
-                    voices.append(f"{name}-{gender}")
-                name = ""
-    voices.sort()
+            current_voice["Name"] = line.replace("Name: ", "").strip()
+        elif line.startswith("Gender: "):
+            current_voice["Gender"] = line.replace("Gender: ", "").strip()
+    
+    # Handle the last voice
+    if current_voice:
+        voice_locale = current_voice["Name"].split("-")[0:2]
+        voice_locale = "-".join(voice_locale)
+        if not filter_locals or voice_locale in filter_locals:
+            voices.append(current_voice["Name"])
+    
     return voices
 
 
@@ -1331,7 +1338,7 @@ if __name__ == "__main__":
             "zh-CN-YunxiNeural",
         ]
         text = """
-        静夜思是唐代诗人李白创作的一首五言古诗。这首诗描绘了诗人在寂静的夜晚，看到窗前的明月，不禁想起远方的家乡和亲人，表达了他对家乡和亲人的深深思念之情。全诗内容是：“床前明月光，疑是地上霜。举头望明月，低头思故乡。”在这短短的四句诗中，诗人通过“明月”和“思故乡”的意象，巧妙地表达了离乡背井人的孤独与哀愁。首句“床前明月光”设景立意，通过明亮的月光引出诗人的遐想；“疑是地上霜”增添了夜晚的寒冷感，加深了诗人的孤寂之情；“举头望明月”和“低头思故乡”则是情感的升华，展现了诗人内心深处的乡愁和对家的渴望。这首诗简洁明快，情感真挚，是中国古典诗歌中非常著名的一首，也深受后人喜爱和推崇。
+        静夜思是唐代诗人李白创作的一首五言古诗。这首诗描绘了诗人在寂静的夜晚，看到窗前的明月，不禁想起远方的家乡和亲人，表达了他对家乡和亲人的深深思念之情。全诗内容是："床前明月光，疑是地上霜。举头望明月，低头思故乡。"在这短短的四句诗中，诗人通过"明月"和"思故乡"的意象，巧妙地表达了离乡背井人的孤独与哀愁。首句"床前明月光"设景立意，通过明亮的月光引出诗人的遐想；"疑是地上霜"增添了夜晚的寒冷感，加深了诗人的孤寂之情；"举头望明月"和"低头思故乡"则是情感的升华，展现了诗人内心深处的乡愁和对家的渴望。这首诗简洁明快，情感真挚，是中国古典诗歌中非常著名的一首，也深受后人喜爱和推崇。
             """
 
         text = """

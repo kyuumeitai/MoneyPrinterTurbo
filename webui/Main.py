@@ -49,14 +49,24 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.title(f"MoneyPrinterTurbo v{config.project_version}")
 
 support_locales = [
-    "zh-CN",
-    "zh-HK",
-    "zh-TW",
-    "de-DE",
     "en-US",
-    "fr-FR",
-    "vi-VN",
-    "th-TH",
+    "es-AR",
+    "es-ES",
+    "es-MX",
+    "es-US",
+    "es-VE",
+    "es-CO",
+    "es-PE",
+    "es-CL",
+    "es-EC",
+    "es-GT",
+    "es-HN",
+    "es-NI",
+    "es-PA",
+    "es-PY",
+    "es-UY",
+    "es-VE"
+    
 ]
 
 font_dir = os.path.join(root_dir, "resource", "fonts")
